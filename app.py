@@ -38,7 +38,7 @@ def read_root():
 def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
 
-@app.post("/digitize")
+@app.post("/openapi/extract")
 def read_item(request:Item):
     extracter=TextExtractor(request.data, client)
     extracted_data=extracter.extract_fields_with_open_ai(keys_extraction)
