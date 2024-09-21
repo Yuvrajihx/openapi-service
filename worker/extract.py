@@ -1,8 +1,10 @@
 import pdfplumber
 
 class TextExtractor:
-    def __init__(self, text: str, client):
-        self.text = text
+    def __init__(self, request, client):
+        self.mailBox = request.mailBox
+        self.messageId = request.messageId
+        self.text=request.data
         self.client = client
 
 
