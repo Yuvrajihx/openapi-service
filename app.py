@@ -1,8 +1,11 @@
 import json
 import openai
+import datetime
+import pytz
 from fastapi import FastAPI
 from openai import OpenAI
 from worker.extract import TextExtractor
+from worker.timezoneHandler import get_isttime
 from pydantic import BaseModel
 # from worker.prompt import keys_extraction
 from config.db import MongoDBConfig
@@ -26,6 +29,7 @@ class RequestItem(BaseModel):
     data:str
     mailBox:str
     messageId:str
+    emailSubject:str
 
 class Prompt(BaseModel):
     prompt:str
@@ -63,8 +67,8 @@ def read_item(request:RequestItem):
         extracted_data=extracter.extract_fields_with_open_ai(keys_extraction.get("prompt"))
         try:
             data = json.loads(extracted_data)
-            data["mailBox"]=request.mailBox
-            data["messageId"]=request.messageId
+            data["emailMeta"]={"mailBox":request.mailBox,"messageId":request.messageId,"emailSubject":request.emailSubject}
+            data["emailMeta"]["Request_TS"]=get_isttime()
             print("Manually Parsed JSON:", data)
             db_config.get_collection().insert_one(data)
             return {"isDataExtracted": True}
